@@ -1,0 +1,67 @@
+plugins {
+	id 'java-library'
+	id 'maven-publish'
+	id 'org.springframework.boot' version '3.4.4'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'ru.itis.vhsroni'
+version = '1.0.0'
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+repositories {
+	mavenCentral()
+	mavenLocal()
+}
+
+dependencyManagement {
+	imports {
+		mavenBom 'org.springframework.boot:spring-boot-dependencies:3.4.4'
+	}
+}
+
+ext {
+	janinoVersion = '3.0.6'
+}
+
+dependencies {
+	api 'org.springframework.boot:spring-boot-autoconfigure'
+	api 'org.springframework.boot:spring-boot-starter-aop'
+	api 'org.springframework.boot:spring-boot-starter-logging'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	implementation "org.codehaus.janino:janino:${janinoVersion}"
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+
+publishing {
+	publications {
+		maven(MavenPublication) {
+			groupId = "ru.itis.vhsroni"
+			artifactId = 'logging-starter'
+			version = '1.0.0'
+			from components.java
+
+			versionMapping {
+				usage('java-api') {
+					fromResolutionResult()
+				}
+				usage('java-runtime') {
+					fromResolutionResult()
+				}
+			}
+		}
+	}
+	repositories {
+		mavenLocal()
+	}
+}

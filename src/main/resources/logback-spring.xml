@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <springProperty name="logToFile" source="ru.itis.vhsroni.logging-starter.logToFile"/>
+    <springProperty name="errorLogsFilePath" source="ru.itis.vhsroni.logging-starter.errorLogsFilePath"/>
+    <springProperty name="springLogsFilePath" source="ru.itis.vhsroni.logging-starter.springLogsFilePath"/>
+    <springProperty name="basePackages" source="ru.itis.vhsroni.logging-starter.basePackages"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %magenta(%d{yyyy-MM-dd HH:mm:ss}) %magenta(%-5level %logger{36}) - %msg %magenta(%X{executionTime}) %n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SPRING_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${springLogsFilePath}</file>
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg %X{executionTime} %n
+            </pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${errorLogsFilePath}</file>
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg %X{executionTime} %n
+            </pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+    </appender>
+
+    <springProfile name="default">
+        <logger name="${basePackages}" level="INFO" additivity="false">
+            <if condition='${logToFile}'>
+                <then>
+                    <appender-ref ref="CONSOLE"/>
+                    <appender-ref ref="SPRING_FILE"/>
+                </then>
+            </if>
+        </logger>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="debug">
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+</configuration>
